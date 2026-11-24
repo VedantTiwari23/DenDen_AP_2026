@@ -1,0 +1,90 @@
+QUERY:
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT u.user_id, u.username, p.display_name, p.avatar_url, p.is_online, p.last_seen
+FROM friendships f
+JOIN users u ON u.user_id = f.friend_id
+JOIN user_profiles p ON p.user_id = u.user_id
+WHERE f.user_id = '11111111-1111-1111-1111-111111111111' 
+  AND f.status = 'ACCEPTED'
+ORDER BY p.is_online DESC, p.last_seen DESC;
+
+================================================================================
+RUN 1:
+--------------------------------------------------------------------------------
+Sort  (cost=24.58..24.59 rows=2 width=267) (actual time=0.065..0.067 rows=3 loops=1)
+  Sort Key: p.is_online DESC, p.last_seen DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=8
+  ->  Nested Loop  (cost=0.45..24.57 rows=2 width=267) (actual time=0.039..0.052 rows=3 loops=1)
+        Buffers: shared hit=8
+        ->  Nested Loop  (cost=0.30..16.38 rows=2 width=47) (actual time=0.026..0.034 rows=3 loops=1)
+              Buffers: shared hit=5
+              ->  Bitmap Heap Scan on friendships f  (cost=0.15..8.18 rows=2 width=16) (actual time=0.015..0.017 rows=3 loops=1)
+                    Recheck Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+                    Filter: ((status)::text = 'ACCEPTED'::text)
+                    Buffers: shared hit=2
+                    ->  Bitmap Index Scan on friendships_pkey  (cost=0.00..0.15 rows=4 width=0) (actual time=0.009..0.009 rows=3 loops=1)
+                          Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+                          Buffers: shared hit=1
+              ->  Index Scan using users_pkey on users u  (cost=0.15..4.10 rows=1 width=47) (actual time=0.005..0.005 rows=1 loops=3)
+                    Index Cond: (user_id = f.friend_id)
+                    Buffers: shared hit=3
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..4.09 rows=1 width=236) (actual time=0.005..0.005 rows=1 loops=3)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=3
+Planning Time: 0.185 ms
+Execution Time: 0.098 ms
+
+================================================================================
+RUN 2:
+--------------------------------------------------------------------------------
+Sort  (cost=24.58..24.59 rows=2 width=267) (actual time=0.048..0.050 rows=3 loops=1)
+  Sort Key: p.is_online DESC, p.last_seen DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=8
+  ->  Nested Loop  (cost=0.45..24.57 rows=2 width=267) (actual time=0.028..0.039 rows=3 loops=1)
+        Buffers: shared hit=8
+        ->  Nested Loop  (cost=0.30..16.38 rows=2 width=47) (actual time=0.019..0.026 rows=3 loops=1)
+              Buffers: shared hit=5
+              ->  Bitmap Heap Scan on friendships f  (cost=0.15..8.18 rows=2 width=16) (actual time=0.010..0.012 rows=3 loops=1)
+                    Recheck Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+                    Filter: ((status)::text = 'ACCEPTED'::text)
+                    Buffers: shared hit=2
+                    ->  Bitmap Index Scan on friendships_pkey  (cost=0.00..0.15 rows=4 width=0) (actual time=0.005..0.005 rows=3 loops=1)
+                          Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+                          Buffers: shared hit=1
+              ->  Index Scan using users_pkey on users u  (cost=0.15..4.10 rows=1 width=47) (actual time=0.004..0.004 rows=1 loops=3)
+                    Index Cond: (user_id = f.friend_id)
+                    Buffers: shared hit=3
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..4.09 rows=1 width=236) (actual time=0.004..0.004 rows=1 loops=3)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=3
+Planning Time: 0.112 ms
+Execution Time: 0.076 ms
+
+================================================================================
+RUN 3:
+--------------------------------------------------------------------------------
+Sort  (cost=24.58..24.59 rows=2 width=267) (actual time=0.046..0.047 rows=3 loops=1)
+  Sort Key: p.is_online DESC, p.last_seen DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=8
+  ->  Nested Loop  (cost=0.45..24.57 rows=2 width=267) (actual time=0.027..0.037 rows=3 loops=1)
+        Buffers: shared hit=8
+        ->  Nested Loop  (cost=0.30..16.38 rows=2 width=47) (actual time=0.018..0.024 rows=3 loops=1)
+              Buffers: shared hit=5
+              ->  Bitmap Heap Scan on friendships f  (cost=0.15..8.18 rows=2 width=16) (actual time=0.009..0.011 rows=3 loops=1)
+                    Recheck Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+                    Filter: ((status)::text = 'ACCEPTED'::text)
+                    Buffers: shared hit=2
+                    ->  Bitmap Index Scan on friendships_pkey  (cost=0.00..0.15 rows=4 width=0) (actual time=0.005..0.005 rows=3 loops=1)
+                          Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+                          Buffers: shared hit=1
+              ->  Index Scan using users_pkey on users u  (cost=0.15..4.10 rows=1 width=47) (actual time=0.004..0.004 rows=1 loops=3)
+                    Index Cond: (user_id = f.friend_id)
+                    Buffers: shared hit=3
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..4.09 rows=1 width=236) (actual time=0.004..0.004 rows=1 loops=3)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=3
+Planning Time: 0.105 ms
+Execution Time: 0.071 ms

@@ -1,0 +1,48 @@
+QUERY:
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT u.user_id, u.username, u.email, p.display_name, p.bio, p.avatar_url, p.is_online, p.last_seen
+FROM users u
+JOIN user_profiles p ON p.user_id = u.user_id
+WHERE u.user_id = '11111111-1111-1111-1111-111111111111';
+
+================================================================================
+RUN 1:
+--------------------------------------------------------------------------------
+Nested Loop  (cost=0.30..16.34 rows=1 width=386) (actual time=0.034..0.036 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Index Scan using users_pkey on users u  (cost=0.15..8.17 rows=1 width=114) (actual time=0.021..0.022 rows=1 loops=1)
+        Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+        Buffers: shared hit=2
+  ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=288) (actual time=0.010..0.011 rows=1 loops=1)
+        Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+        Buffers: shared hit=2
+Planning Time: 0.125 ms
+Execution Time: 0.058 ms
+
+================================================================================
+RUN 2:
+--------------------------------------------------------------------------------
+Nested Loop  (cost=0.30..16.34 rows=1 width=386) (actual time=0.026..0.028 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Index Scan using users_pkey on users u  (cost=0.15..8.17 rows=1 width=114) (actual time=0.016..0.017 rows=1 loops=1)
+        Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+        Buffers: shared hit=2
+  ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=288) (actual time=0.008..0.009 rows=1 loops=1)
+        Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+        Buffers: shared hit=2
+Planning Time: 0.075 ms
+Execution Time: 0.044 ms
+
+================================================================================
+RUN 3:
+--------------------------------------------------------------------------------
+Nested Loop  (cost=0.30..16.34 rows=1 width=386) (actual time=0.025..0.027 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Index Scan using users_pkey on users u  (cost=0.15..8.17 rows=1 width=114) (actual time=0.015..0.016 rows=1 loops=1)
+        Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+        Buffers: shared hit=2
+  ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=288) (actual time=0.008..0.009 rows=1 loops=1)
+        Index Cond: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+        Buffers: shared hit=2
+Planning Time: 0.071 ms
+Execution Time: 0.042 ms

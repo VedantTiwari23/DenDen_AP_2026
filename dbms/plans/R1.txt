@@ -1,0 +1,51 @@
+QUERY:
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT u.user_id, u.username, u.password_hash, p.display_name, p.avatar_url
+FROM users u
+JOIN user_profiles p ON p.user_id = u.user_id
+WHERE lower(u.email) = 'alex@gmail.com';
+
+================================================================================
+RUN 1:
+--------------------------------------------------------------------------------
+Nested Loop  (cost=0.15..16.42 rows=1 width=386) (actual time=0.038..0.041 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Seq Scan on users u  (cost=0.00..8.12 rows=1 width=130) (actual time=0.024..0.026 rows=1 loops=1)
+        Filter: (lower((email)::text) = 'alex@gmail.com'::text)
+        Rows Removed by Filter: 49
+        Buffers: shared hit=2
+  ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=272) (actual time=0.010..0.011 rows=1 loops=1)
+        Index Cond: (user_id = u.user_id)
+        Buffers: shared hit=2
+Planning Time: 0.152 ms
+Execution Time: 0.068 ms
+
+================================================================================
+RUN 2:
+--------------------------------------------------------------------------------
+Nested Loop  (cost=0.15..16.42 rows=1 width=386) (actual time=0.031..0.034 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Seq Scan on users u  (cost=0.00..8.12 rows=1 width=130) (actual time=0.020..0.021 rows=1 loops=1)
+        Filter: (lower((email)::text) = 'alex@gmail.com'::text)
+        Rows Removed by Filter: 49
+        Buffers: shared hit=2
+  ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=272) (actual time=0.009..0.010 rows=1 loops=1)
+        Index Cond: (user_id = u.user_id)
+        Buffers: shared hit=2
+Planning Time: 0.088 ms
+Execution Time: 0.052 ms
+
+================================================================================
+RUN 3:
+--------------------------------------------------------------------------------
+Nested Loop  (cost=0.15..16.42 rows=1 width=386) (actual time=0.030..0.032 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Seq Scan on users u  (cost=0.00..8.12 rows=1 width=130) (actual time=0.019..0.020 rows=1 loops=1)
+        Filter: (lower((email)::text) = 'alex@gmail.com'::text)
+        Rows Removed by Filter: 49
+        Buffers: shared hit=2
+  ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=272) (actual time=0.009..0.010 rows=1 loops=1)
+        Index Cond: (user_id = u.user_id)
+        Buffers: shared hit=2
+Planning Time: 0.082 ms
+Execution Time: 0.048 ms

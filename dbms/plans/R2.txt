@@ -1,0 +1,58 @@
+QUERY:
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT u.user_id, u.username, p.display_name, p.avatar_url
+FROM users u
+JOIN user_profiles p ON p.user_id = u.user_id
+WHERE u.username ILIKE 'sam%'
+LIMIT 10;
+
+================================================================================
+RUN 1:
+--------------------------------------------------------------------------------
+Limit  (cost=0.15..16.42 rows=1 width=266) (actual time=0.035..0.038 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Nested Loop  (cost=0.15..16.42 rows=1 width=266) (actual time=0.034..0.036 rows=1 loops=1)
+        Buffers: shared hit=4
+        ->  Seq Scan on users u  (cost=0.00..8.25 rows=1 width=46) (actual time=0.021..0.023 rows=1 loops=1)
+              Filter: ((username)::text ~~* 'sam%'::text)
+              Rows Removed by Filter: 49
+              Buffers: shared hit=2
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=236) (actual time=0.010..0.011 rows=1 loops=1)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=2
+Planning Time: 0.138 ms
+Execution Time: 0.063 ms
+
+================================================================================
+RUN 2:
+--------------------------------------------------------------------------------
+Limit  (cost=0.15..16.42 rows=1 width=266) (actual time=0.028..0.030 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Nested Loop  (cost=0.15..16.42 rows=1 width=266) (actual time=0.027..0.029 rows=1 loops=1)
+        Buffers: shared hit=4
+        ->  Seq Scan on users u  (cost=0.00..8.25 rows=1 width=46) (actual time=0.017..0.018 rows=1 loops=1)
+              Filter: ((username)::text ~~* 'sam%'::text)
+              Rows Removed by Filter: 49
+              Buffers: shared hit=2
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=236) (actual time=0.009..0.009 rows=1 loops=1)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=2
+Planning Time: 0.081 ms
+Execution Time: 0.048 ms
+
+================================================================================
+RUN 3:
+--------------------------------------------------------------------------------
+Limit  (cost=0.15..16.42 rows=1 width=266) (actual time=0.027..0.029 rows=1 loops=1)
+  Buffers: shared hit=4
+  ->  Nested Loop  (cost=0.15..16.42 rows=1 width=266) (actual time=0.026..0.028 rows=1 loops=1)
+        Buffers: shared hit=4
+        ->  Seq Scan on users u  (cost=0.00..8.25 rows=1 width=46) (actual time=0.016..0.017 rows=1 loops=1)
+              Filter: ((username)::text ~~* 'sam%'::text)
+              Rows Removed by Filter: 49
+              Buffers: shared hit=2
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..8.17 rows=1 width=236) (actual time=0.008..0.009 rows=1 loops=1)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=2
+Planning Time: 0.076 ms
+Execution Time: 0.045 ms

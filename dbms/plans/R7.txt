@@ -1,0 +1,87 @@
+QUERY:
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT m.message_id, m.sender_id, u.username, p.display_name, m.content, m.message_type, m.sent_at
+FROM messages m
+JOIN users u ON u.user_id = m.sender_id
+JOIN user_profiles p ON p.user_id = u.user_id
+WHERE m.conversation_id = '22222222-2222-2222-2222-222222222222'
+ORDER BY m.sent_at DESC
+LIMIT 50;
+
+================================================================================
+RUN 1:
+--------------------------------------------------------------------------------
+Limit  (cost=25.86..25.87 rows=5 width=344) (actual time=0.078..0.081 rows=12 loops=1)
+  Buffers: shared hit=14
+  ->  Sort  (cost=25.86..25.87 rows=5 width=344) (actual time=0.077..0.079 rows=12 loops=1)
+        Sort Key: m.sent_at DESC
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=14
+        ->  Nested Loop  (cost=0.45..25.80 rows=5 width=344) (actual time=0.041..0.063 rows=12 loops=1)
+              Buffers: shared hit=14
+              ->  Nested Loop  (cost=0.30..17.55 rows=5 width=124) (actual time=0.029..0.043 rows=12 loops=1)
+                    Buffers: shared hit=8
+                    ->  Seq Scan on messages m  (cost=0.00..9.38 rows=5 width=93) (actual time=0.018..0.024 rows=12 loops=1)
+                          Filter: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                          Rows Removed by Filter: 38
+                          Buffers: shared hit=2
+                    ->  Index Scan using users_pkey on users u  (cost=0.15..1.63 rows=1 width=47) (actual time=0.001..0.001 rows=1 loops=12)
+                          Index Cond: (user_id = m.sender_id)
+                          Buffers: shared hit=6
+              ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..1.65 rows=1 width=236) (actual time=0.001..0.001 rows=1 loops=12)
+                    Index Cond: (user_id = u.user_id)
+                    Buffers: shared hit=6
+Planning Time: 0.176 ms
+Execution Time: 0.114 ms
+
+================================================================================
+RUN 2:
+--------------------------------------------------------------------------------
+Limit  (cost=25.86..25.87 rows=5 width=344) (actual time=0.059..0.061 rows=12 loops=1)
+  Buffers: shared hit=14
+  ->  Sort  (cost=25.86..25.87 rows=5 width=344) (actual time=0.058..0.060 rows=12 loops=1)
+        Sort Key: m.sent_at DESC
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=14
+        ->  Nested Loop  (cost=0.45..25.80 rows=5 width=344) (actual time=0.030..0.048 rows=12 loops=1)
+              Buffers: shared hit=14
+              ->  Nested Loop  (cost=0.30..17.55 rows=5 width=124) (actual time=0.021..0.033 rows=12 loops=1)
+                    Buffers: shared hit=8
+                    ->  Seq Scan on messages m  (cost=0.00..9.38 rows=5 width=93) (actual time=0.013..0.018 rows=12 loops=1)
+                          Filter: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                          Rows Removed by Filter: 38
+                          Buffers: shared hit=2
+                    ->  Index Scan using users_pkey on users u  (cost=0.15..1.63 rows=1 width=47) (actual time=0.001..0.001 rows=1 loops=12)
+                          Index Cond: (user_id = m.sender_id)
+                          Buffers: shared hit=6
+              ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..1.65 rows=1 width=236) (actual time=0.001..0.001 rows=1 loops=12)
+                    Index Cond: (user_id = u.user_id)
+                    Buffers: shared hit=6
+Planning Time: 0.108 ms
+Execution Time: 0.089 ms
+
+================================================================================
+RUN 3:
+--------------------------------------------------------------------------------
+Limit  (cost=25.86..25.87 rows=5 width=344) (actual time=0.057..0.059 rows=12 loops=1)
+  Buffers: shared hit=14
+  ->  Sort  (cost=25.86..25.87 rows=5 width=344) (actual time=0.056..0.058 rows=12 loops=1)
+        Sort Key: m.sent_at DESC
+        Sort Method: quicksort  Memory: 26kB
+        Buffers: shared hit=14
+        ->  Nested Loop  (cost=0.45..25.80 rows=5 width=344) (actual time=0.029..0.046 rows=12 loops=1)
+              Buffers: shared hit=14
+              ->  Nested Loop  (cost=0.30..17.55 rows=5 width=124) (actual time=0.020..0.031 rows=12 loops=1)
+                    Buffers: shared hit=8
+                    ->  Seq Scan on messages m  (cost=0.00..9.38 rows=5 width=93) (actual time=0.012..0.016 rows=12 loops=1)
+                          Filter: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                          Rows Removed by Filter: 38
+                          Buffers: shared hit=2
+                    ->  Index Scan using users_pkey on users u  (cost=0.15..1.63 rows=1 width=47) (actual time=0.001..0.001 rows=1 loops=12)
+                          Index Cond: (user_id = m.sender_id)
+                          Buffers: shared hit=6
+              ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..1.65 rows=1 width=236) (actual time=0.001..0.001 rows=1 loops=12)
+                    Index Cond: (user_id = u.user_id)
+                    Buffers: shared hit=6
+Planning Time: 0.101 ms
+Execution Time: 0.084 ms

@@ -1,0 +1,64 @@
+QUERY:
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT c.conversation_id, c.title, c.is_group, cp.role, cp.joined_at
+FROM conversation_participants cp
+JOIN conversations c ON c.conversation_id = cp.conversation_id
+WHERE cp.user_id = '11111111-1111-1111-1111-111111111111'
+ORDER BY c.created_at DESC;
+
+================================================================================
+RUN 1:
+--------------------------------------------------------------------------------
+Sort  (cost=16.35..16.36 rows=2 width=141) (actual time=0.048..0.050 rows=2 loops=1)
+  Sort Key: c.created_at DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=5
+  ->  Nested Loop  (cost=0.15..16.34 rows=2 width=141) (actual time=0.030..0.037 rows=2 loops=1)
+        Buffers: shared hit=5
+        ->  Seq Scan on conversation_participants cp  (cost=0.00..8.16 rows=2 width=40) (actual time=0.017..0.020 rows=2 loops=1)
+              Filter: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+              Rows Removed by Filter: 28
+              Buffers: shared hit=2
+        ->  Index Scan using conversations_pkey on conversations c  (cost=0.15..4.09 rows=1 width=117) (actual time=0.007..0.007 rows=1 loops=2)
+              Index Cond: (conversation_id = cp.conversation_id)
+              Buffers: shared hit=3
+Planning Time: 0.145 ms
+Execution Time: 0.076 ms
+
+================================================================================
+RUN 2:
+--------------------------------------------------------------------------------
+Sort  (cost=16.35..16.36 rows=2 width=141) (actual time=0.036..0.037 rows=2 loops=1)
+  Sort Key: c.created_at DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=5
+  ->  Nested Loop  (cost=0.15..16.34 rows=2 width=141) (actual time=0.022..0.028 rows=2 loops=1)
+        Buffers: shared hit=5
+        ->  Seq Scan on conversation_participants cp  (cost=0.00..8.16 rows=2 width=40) (actual time=0.012..0.014 rows=2 loops=1)
+              Filter: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+              Rows Removed by Filter: 28
+              Buffers: shared hit=2
+        ->  Index Scan using conversations_pkey on conversations c  (cost=0.15..4.09 rows=1 width=117) (actual time=0.005..0.006 rows=1 loops=2)
+              Index Cond: (conversation_id = cp.conversation_id)
+              Buffers: shared hit=3
+Planning Time: 0.088 ms
+Execution Time: 0.057 ms
+
+================================================================================
+RUN 3:
+--------------------------------------------------------------------------------
+Sort  (cost=16.35..16.36 rows=2 width=141) (actual time=0.035..0.036 rows=2 loops=1)
+  Sort Key: c.created_at DESC
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=5
+  ->  Nested Loop  (cost=0.15..16.34 rows=2 width=141) (actual time=0.021..0.027 rows=2 loops=1)
+        Buffers: shared hit=5
+        ->  Seq Scan on conversation_participants cp  (cost=0.00..8.16 rows=2 width=40) (actual time=0.011..0.014 rows=2 loops=1)
+              Filter: (user_id = '11111111-1111-1111-1111-111111111111'::uuid)
+              Rows Removed by Filter: 28
+              Buffers: shared hit=2
+        ->  Index Scan using conversations_pkey on conversations c  (cost=0.15..4.09 rows=1 width=117) (actual time=0.005..0.005 rows=1 loops=2)
+              Index Cond: (conversation_id = cp.conversation_id)
+              Buffers: shared hit=3
+Planning Time: 0.083 ms
+Execution Time: 0.054 ms

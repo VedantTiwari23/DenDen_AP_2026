@@ -1,0 +1,86 @@
+QUERY:
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT u.user_id, u.username, p.display_name, cp.role, cp.joined_at
+FROM conversation_participants cp
+JOIN users u ON u.user_id = cp.user_id
+JOIN user_profiles p ON p.user_id = u.user_id
+WHERE cp.conversation_id = '22222222-2222-2222-2222-222222222222'
+ORDER BY cp.joined_at ASC;
+
+================================================================================
+RUN 1:
+--------------------------------------------------------------------------------
+Sort  (cost=16.42..16.43 rows=3 width=279) (actual time=0.061..0.063 rows=4 loops=1)
+  Sort Key: cp.joined_at
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=9
+  ->  Nested Loop  (cost=0.45..16.39 rows=3 width=279) (actual time=0.035..0.048 rows=4 loops=1)
+        Buffers: shared hit=9
+        ->  Nested Loop  (cost=0.30..16.34 rows=3 width=59) (actual time=0.024..0.033 rows=4 loops=1)
+              Buffers: shared hit=6
+              ->  Bitmap Heap Scan on conversation_participants cp  (cost=0.15..8.17 rows=3 width=40) (actual time=0.015..0.017 rows=4 loops=1)
+                    Recheck Cond: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                    Buffers: shared hit=2
+                    ->  Bitmap Index Scan on conversation_participants_pkey  (cost=0.00..0.15 rows=3 width=0) (actual time=0.008..0.008 rows=4 loops=1)
+                          Index Cond: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                          Buffers: shared hit=1
+              ->  Index Scan using users_pkey on users u  (cost=0.15..2.72 rows=1 width=47) (actual time=0.003..0.003 rows=1 loops=4)
+                    Index Cond: (user_id = cp.user_id)
+                    Buffers: shared hit=4
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..2.71 rows=1 width=236) (actual time=0.003..0.003 rows=1 loops=4)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=3
+Planning Time: 0.165 ms
+Execution Time: 0.089 ms
+
+================================================================================
+RUN 2:
+--------------------------------------------------------------------------------
+Sort  (cost=16.42..16.43 rows=3 width=279) (actual time=0.044..0.046 rows=4 loops=1)
+  Sort Key: cp.joined_at
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=9
+  ->  Nested Loop  (cost=0.45..16.39 rows=3 width=279) (actual time=0.026..0.036 rows=4 loops=1)
+        Buffers: shared hit=9
+        ->  Nested Loop  (cost=0.30..16.34 rows=3 width=59) (actual time=0.018..0.025 rows=4 loops=1)
+              Buffers: shared hit=6
+              ->  Bitmap Heap Scan on conversation_participants cp  (cost=0.15..8.17 rows=3 width=40) (actual time=0.010..0.012 rows=4 loops=1)
+                    Recheck Cond: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                    Buffers: shared hit=2
+                    ->  Bitmap Index Scan on conversation_participants_pkey  (cost=0.00..0.15 rows=3 width=0) (actual time=0.005..0.005 rows=4 loops=1)
+                          Index Cond: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                          Buffers: shared hit=1
+              ->  Index Scan using users_pkey on users u  (cost=0.15..2.72 rows=1 width=47) (actual time=0.003..0.003 rows=1 loops=4)
+                    Index Cond: (user_id = cp.user_id)
+                    Buffers: shared hit=4
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..2.71 rows=1 width=236) (actual time=0.002..0.002 rows=1 loops=4)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=3
+Planning Time: 0.098 ms
+Execution Time: 0.068 ms
+
+================================================================================
+RUN 3:
+--------------------------------------------------------------------------------
+Sort  (cost=16.42..16.43 rows=3 width=279) (actual time=0.043..0.044 rows=4 loops=1)
+  Sort Key: cp.joined_at
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=9
+  ->  Nested Loop  (cost=0.45..16.39 rows=3 width=279) (actual time=0.025..0.035 rows=4 loops=1)
+        Buffers: shared hit=9
+        ->  Nested Loop  (cost=0.30..16.34 rows=3 width=59) (actual time=0.017..0.024 rows=4 loops=1)
+              Buffers: shared hit=6
+              ->  Bitmap Heap Scan on conversation_participants cp  (cost=0.15..8.17 rows=3 width=40) (actual time=0.010..0.011 rows=4 loops=1)
+                    Recheck Cond: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                    Buffers: shared hit=2
+                    ->  Bitmap Index Scan on conversation_participants_pkey  (cost=0.00..0.15 rows=3 width=0) (actual time=0.005..0.005 rows=4 loops=1)
+                          Index Cond: (conversation_id = '22222222-2222-2222-2222-222222222222'::uuid)
+                          Buffers: shared hit=1
+              ->  Index Scan using users_pkey on users u  (cost=0.15..2.72 rows=1 width=47) (actual time=0.003..0.003 rows=1 loops=4)
+                    Index Cond: (user_id = cp.user_id)
+                    Buffers: shared hit=4
+        ->  Index Scan using user_profiles_pkey on user_profiles p  (cost=0.15..2.71 rows=1 width=236) (actual time=0.002..0.002 rows=1 loops=4)
+              Index Cond: (user_id = u.user_id)
+              Buffers: shared hit=3
+Planning Time: 0.091 ms
+Execution Time: 0.065 ms
